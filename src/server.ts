@@ -5,7 +5,41 @@ import { PostgresError } from 'postgres'
 
 const app = fastify()
 
-app.post('/links', async (req, reply) => {
+app.get('/:code', async (req, reply) => {
+    const codeSchema = z.object({
+        code: z.string().min(3),
+    })
+
+    const { code } = codeSchema.parse(req.params)
+
+    const queryResult = await pg/*sql*/`
+        SELECT id, original_url
+        FROM shortened_links
+        WHERE shortened_links.code = ${code}
+    `
+
+    if (queryResult.length === 0) {
+        return reply.status(400).send({
+            message: 'Link not found.'
+        })
+    }
+
+    const { original_url } = queryResult[0]
+
+    return reply.redirect(301, original_url)
+})
+
+app.get('/api/links', async () => {
+    const queryResult = await pg/*sql*/`
+        SELECT *
+        FROM shortened_links
+        ORDER BY created_at DESC
+    `
+
+    return queryResult
+})
+
+app.post('/api/links', async (req, reply) => {
     const linkSchema = z.object({
         code: z.string().min(3),
         url: z.string().url(),
@@ -20,9 +54,9 @@ app.post('/links', async (req, reply) => {
             RETURNING id
         `
 
-        const link = insertionId[0]
+        const { id } = insertionId[0]
 
-        return reply.status(201).send({ shortenedLinkId: link.id })
+        return reply.status(201).send({ shortenedLinkId: id })
     } catch (error) {
         if (error instanceof PostgresError) {
             if (error.code === "23505") {

@@ -2,8 +2,8 @@ POST http://localhost:3333/api/links
 Content-Type: application/json
 
 {
-    "code": "querotela",
-    "url": "https://quero-tela-frontend.vercel.app/"
+    "code": "wiki",
+    "url": "https://www.wikipedia.org/"
 }
 
 ###
@@ -12,4 +12,8 @@ GET http://localhost:3333/api/links
 
 ###
 
-GET http://localhost:3333/querotela
+GET http://localhost:3333/github
+
+###
+
+GET http://localhost:3333/api/metrics

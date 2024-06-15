@@ -4,11 +4,15 @@ interface Tag {
     id: string
     code: string
     original_url: string
+}[]
+
+type Props = {
+    debouncedFilter: string
 }
 
-export function Table () {
+export function Table ({ debouncedFilter }: Props) {
     const { data: linksResponse, isLoading } = useQuery<Tag[]>({
-        queryKey: ['get-links'],
+        queryKey: ['get-links', debouncedFilter],
         queryFn: async () => {
             const response = await fetch('http://localhost:3333/api/links')
             const data = await response.json()
@@ -20,6 +24,8 @@ export function Table () {
         return null
     }
 
+    const links = linksResponse?.filter(link => link.code.includes(debouncedFilter))
+
     return (
         <table className="w-full text-sm border-t-2 border-b-2 border-slate-950">
             <thead>
@@ -29,7 +35,7 @@ export function Table () {
                 </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0 [&_tr:hover]:bg-zinc-800/50">
-                {linksResponse?.map((tag) => {
+                {links?.map((tag) => {
                     return (
                         <tr key={tag.id}>
                             <td className="font-m edium py-3 px-4">{tag.code}</td>

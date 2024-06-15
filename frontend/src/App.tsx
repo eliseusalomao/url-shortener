@@ -1,8 +1,13 @@
 import { Plus } from 'lucide-react'
 import { Input } from './components/input'
 import { Table } from './components/table'
+import { useState } from 'react'
+import useDebounce from './hooks/debounce'
 
 export function App () {
+    const [filter, setFilter] = useState('')
+    const debouncedFilter = useDebounce(filter, 1000)
+
     return (
         <div className="py-10 px-2 space-y-8">
             <div>
@@ -20,10 +25,15 @@ export function App () {
 
 
                 <div className="flex items-center justify-between">
-                    <Input />
+                    <Input
+                        setFilter={setFilter}
+                        filter={filter}
+                    />
                 </div>
 
-                <Table />
+                <Table
+                    debouncedFilter={debouncedFilter}
+                />
             </main>
         </div>
     )

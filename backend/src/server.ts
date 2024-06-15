@@ -1,10 +1,17 @@
 import fastify from 'fastify'
+import cors from '@fastify/cors'
 import { z } from 'zod'
 import { pg } from './lib/postgres'
 import { PostgresError } from 'postgres'
 import { redis } from './lib/redis'
 
 const app = fastify()
+
+app.register(cors, {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true
+})
 
 app.get('/:code', async (req, reply) => {
     const codeSchema = z.object({
